@@ -5,4 +5,4 @@
 ### 工夫した点：カギを雲の上にランダム配置させることで毎回楽しめるようにした点
 ###             アバターの上に名前を表示させることでどれが自分のアバターかわかりやすいようにした点
 ### 以下のURLにプレイ動画を載せてます
-### (https://drive.google.com/file/d/1yTE3RJTXdQQ0TsL0isl6iXa2hcYPvIQ-/view?usp=sharing)
+### (https://drive.google.com/file/d/1BxL6saSnaqKcLRoq5yIVWt5Ac8qGJpLb/view?usp=sharing)
