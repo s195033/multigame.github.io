@@ -3,6 +3,7 @@ using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; // LoadSceneを使うために必要!!
 
 public class MatchmakingView : MonoBehaviourPunCallbacks
 {
@@ -32,6 +33,8 @@ public class MatchmakingView : MonoBehaviourPunCallbacks
     {
         // ロビーに参加したら、入力できるようにする
         canvasGroup.interactable = true;
+        // ロビーに参加するだけでは、ルーム作成ボタンを押せないようにする
+        createRoomButton.interactable = false;
     }
 
     private void OnRoomNameInputFieldValueChanged(string value)
