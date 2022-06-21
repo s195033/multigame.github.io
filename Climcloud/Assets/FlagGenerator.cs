@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FlagGenerator : MonoBehaviour
+public class FlagGenerator : MonoBehaviourPunCallbacks
 {
     public GameObject flagPrefab;
     GameObject quantity;
@@ -11,20 +12,14 @@ public class FlagGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (number == 0)
+        if (PhotonNetwork.LocalPlayer.GetScore() == 0)
         {
             if (count == 0)
             {
                 GameObject go = Instantiate(flagPrefab);
-                go.transform.position = new Vector3(1, 20, 0);
+                go.transform.position = new Vector2(0, 1);
                 count++;
             }
-                
         }
-    }
-
-    public void Quantity()
-    {
-        number -= 1;
     }
 }

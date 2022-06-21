@@ -6,29 +6,46 @@ using UnityEngine;
 public class KeyGenerator : MonoBehaviourPunCallbacks
 {
     [SerializeField]
-    private Key keyPrefab = default;
+    public GameObject keyPrefab;
 
-    private int nextKeyId = 0;
+    private int MaxCounts = 5;
 
+    int start = 11;
+    int end = 15;
+
+    List<int> numbers = new List<int>();
+
+    void Start()
+    {
+        // 数字をリスト化する
+        for (int i = start; i <= end; i++)
+        {
+            numbers.Add(i);
+        }
+    }
     // Update is called once per frame
     void Update()
     {
-        if (nextKeyId < 5)
+        // マスタークライアントだけ鍵を生成させる
+        if (PhotonNetwork.IsMasterClient)
         {
-            var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            var direction = mousePosition - transform.position;
-            float angle = Mathf.Atan2(direction.y, direction.x);
-            // 鍵を生成するたびに鍵のIDを1ずつ増やしていく
-            photonView.RPC(nameof(MasterKey), RpcTarget.All, nextKeyId++, angle);
+            if (MaxCounts > 0)
+            {
+                // 鍵を生成する
+                GameObject key = Instantiate(keyPrefab);
+                // ランダムの数字を取得する
+                int index = Random.Range(0, MaxCounts);
+                // 指定した数字の中からランダムに数字を取得する
+                int cloudNumber = numbers[index];
+                // 雲の位置をランダム取得する
+                Vector2 tmp = GameObject.Find("cloudPrefab (" + cloudNumber + ")").transform.position;
+                // 取得した雲の位置の上にカギを移動させる
+                key.transform.position = new Vector2(tmp.x, tmp.y + 0.8f);
+                // 重複しないように除外する
+                numbers.RemoveAt(index);
+                // 除外したため、最大値を減らしていく
+                MaxCounts--;
+            }
         }
-    }
-
-    [PunRPC]
-    private void MasterKey(int id, float angle)
-    {
-        var key = Instantiate(keyPrefab);
-        Vector3 tmp = GameObject.Find("cloudPrefab (" + Random.Range(26, 100) + ")").transform.position;
-        key.Init(id, photonView.OwnerActorNr, transform.position, angle);
-        key.transform.position = new Vector3(tmp.x, tmp.y + 0.8f, 0);
     }
 }

@@ -15,6 +15,8 @@ public class GameRoomTimeDisplay : MonoBehaviour
         if (!PhotonNetwork.InRoom) { return; }
         // まだゲームの開始時刻が設定されていない場合は更新しない
         if (!PhotonNetwork.CurrentRoom.TryGetStartTime(out int timestamp)) { return; }
+        // まだルーム参加人数が二人未満の場合は更新しない
+        if (PhotonNetwork.PlayerList.Length < 2) { return; }
 
         // ゲームの経過時間を求めて、小数第一位まで表示する
         float elapsedTime = Mathf.Max(0f, unchecked(PhotonNetwork.ServerTimestamp - timestamp) / 1000f);

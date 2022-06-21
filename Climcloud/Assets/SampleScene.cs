@@ -29,23 +29,17 @@ public class SampleScene : MonoBehaviour, IConnectionCallbacks, IMatchmakingCall
         var others = PhotonNetwork.PlayerListOthers;
 
         // ルーム内のネットワークオブジェクトの名前とIDをコンソールに出力する
-        foreach (var photonView in PhotonNetwork.PhotonViewCollection)
+        foreach (var player in PhotonNetwork.PlayerList)
         {
-            Debug.Log($"{photonView.gameObject.name}({photonView.ViewID})");
+            Debug.Log($"{player.NickName}({player.ActorNumber})");
         }
 
         PhotonNetwork.NickName = "Player";
 
-        // ローカルプレイヤーがマスタークライアントかどうかを判定する
+        // ローカルプレイヤーかマスタークライアントかどうかを判定する
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.Log("自身がマスタークライアントです");
-        }
-
-        // "RoomObject"プレハブからルームオブジェクトを生成する
-        if (PhotonNetwork.IsMasterClient)
-        {
-            PhotonNetwork.InstantiateRoomObject("RoomObject", Vector3.zero, Quaternion.identity);
         }
 
         // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
@@ -87,75 +81,4 @@ public class SampleScene : MonoBehaviour, IConnectionCallbacks, IMatchmakingCall
     void IMatchmakingCallbacks.OnJoinRoomFailed(short returnCode, string message) { }
     void IMatchmakingCallbacks.OnJoinRandomFailed(short returnCode, string message) { }
     void IMatchmakingCallbacks.OnLeftRoom() { }
-}
-
-// IPunPrefabPoolインターフェースを実装する
-public class GamePlayerPrefabPool : MonoBehaviour, IPunPrefabPool
-{
-    [SerializeField]
-    private GamePlayer gamePlayerPrefab = default;
-
-    private Stack<GamePlayer> inactiveObjectPool = new Stack<GamePlayer>();
-
-    private void Start()
-    {
-        // ネットワークオブジェクトの生成・破棄を行う処理を、このクラスの処理に差し替える
-        PhotonNetwork.PrefabPool = this;
-    }
-
-    GameObject IPunPrefabPool.Instantiate(string prefabId, Vector3 position, Quaternion rotation)
-    {
-        switch (prefabId)
-        {
-            case "Avatar":
-                GamePlayer player;
-                if (inactiveObjectPool.Count > 0)
-                {
-                    player = inactiveObjectPool.Pop();
-                    player.transform.SetPositionAndRotation(position, rotation);
-                }
-                else
-                {
-                    player = Instantiate(gamePlayerPrefab, position, rotation);
-                    player.gameObject.SetActive(false);
-                }
-                return player.gameObject;
-        }
-        return null;
-    }
-
-    void IPunPrefabPool.Destroy(GameObject gameObject)
-    {
-        var player = gameObject.GetComponent<GamePlayer>();
-        // PhotonNetworkの内部で既に非アクティブ状態にされているので、以下の処理は不要
-        // player.gameObject.SetActive(false);
-        inactiveObjectPool.Push(player);
-    }
-}
-
-public class GamePlayer : MonoBehaviourPunCallbacks
-{
-    private void Awake()
-    {
-        // Object.Instantiateの後に一度だけ必要な初期化処理を行う
-    }
-
-    private void Start()
-    {
-        // 生成後に一度だけ（OnEnableの後に）呼ばれる、ここで初期化処理を行う場合は要注意
-    }
-
-    public override void OnEnable()
-    {
-        base.OnEnable();
-
-        // PhotonNetwork.Instantiateの生成処理後に必要な初期化処理を行う
-    }
-
-    public override void OnDisable()
-    {
-        base.OnDisable();
-
-        // PhotonNetwork.Destroyの破棄処理前に必要な終了処理を行う
-    }
 }

@@ -39,7 +39,15 @@ public class Leaderboard : MonoBehaviour
         builder.Clear();
         foreach (var player in players)
         {
-            builder.AppendLine($"残りのカギはあと{player.GetScore()}つ!!");
+            if (player.GetScore() > 0)
+            {
+                builder.AppendLine($"残りのカギはあと{player.GetScore()}つ!!");
+            }
+            
+            if (player.GetScore() == 0)
+            {
+                builder.AppendLine($"フラッグを目指そう!!");
+            }
         }
         label.text = builder.ToString();
     }
